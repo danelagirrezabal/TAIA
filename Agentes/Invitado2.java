@@ -16,12 +16,12 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-public class Invitado1 extends Agent {
+public class Invitado2 extends Agent {
 
 	private AID[] listaInv;
 
 	protected void setup() {
-		doWait(5000);
+		doWait(10000);
 		// Registrar party-host
 		DFAgentDescription description = new DFAgentDescription();
 		description.setName(getAID());
@@ -133,9 +133,9 @@ public class Invitado1 extends Agent {
 
 		public void action() {
 			tratarSaludos = MessageTemplate.MatchConversationId("Saludo");
-			tratarComida = MessageTemplate.MatchConversationId("Comida");
+			// tratarComida = MessageTemplate.MatchConversationId("Comida");
 			ACLMessage msg = myAgent.receive(tratarSaludos);
-			ACLMessage msg2 = myAgent.receive(tratarComida);
+			// ACLMessage msg2 = myAgent.receive(tratarComida);
 			if (msg != null) {
 				// Se ha recibido un mensaje de Saludo y lo procesamos
 				ACLMessage reply = msg.createReply();
@@ -145,49 +145,52 @@ public class Invitado1 extends Agent {
 				System.out.println("[" + getLocalName() + "]: ¡¡¡Que pasa "
 						+ msg.getSender().getLocalName() + "!!!");
 				send(reply);
-			} else if (msg2 != null) {
-				// Se ha recibido un mensaje de Comida y lo procesamos
-				ACLMessage reply2 = msg2.createReply();
-				reply2.setConversationId("ResponderComida");
-				Random rand = new Random();
-				int ranNum = rand.nextInt(10 - 1 + 1) + 1;
-				if (ranNum == 3) {
-					reply2.setContent("Gin Tonic");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum <= 2) {
-					reply2.setContent("Cerbeza");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 4) {
-					reply2.setContent("Patxaran");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 5) {
-					reply2.setContent("Martini");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 5) {
-					reply2.setContent("Ron");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 6) {
-					reply2.setContent("Whisky");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 7) {
-					reply2.setContent("Agua");
-//					bebida--;
-				} else if (ranNum > 7) {
-					reply2.setContent("Comida");
-//					comida++;
-				}
-				reply2.setPerformative(ACLMessage.REQUEST);
-				System.out.println("[" + getLocalName()
-						+ "]: ¡¡¡Dame un poco de " + reply2.getContent() + " "
-						+ msg2.getSender().getLocalName() + "!!!");
-				send(reply2);
-			} else {
+			}
+			// else if (msg2 != null) {
+			// // Se ha recibido un mensaje de Comida y lo procesamos
+			// ACLMessage reply2 = msg2.createReply();
+			// reply2.setConversationId("ResponderComida");
+			// Random rand = new Random();
+			// int ranNum = rand.nextInt(10 - 1 + 1) + 1;
+			// if (ranNum == 3) {
+			// reply2.setContent("Gin Tonic");
+			// bebida++;
+			// tragos++;
+			// } else if (ranNum <= 2) {
+			// reply2.setContent("Cerbeza");
+			// bebida++;
+			// tragos++;
+			// } else if (ranNum == 4) {
+			// reply2.setContent("Patxaran");
+			// bebida++;
+			// tragos++;
+			// } else if (ranNum == 5) {
+			// reply2.setContent("Martini");
+			// bebida++;
+			// tragos++;
+			// } else if (ranNum == 5) {
+			// reply2.setContent("Ron");
+			// bebida++;
+			// tragos++;
+			// } else if (ranNum == 6) {
+			// reply2.setContent("Whisky");
+			// bebida++;
+			// tragos++;
+			// } else if (ranNum == 7) {
+			// reply2.setContent("Agua");
+			// bebida--;
+			// } else if (ranNum > 7) {
+			// reply2.setContent("Comida");
+			// comida++;
+			// }
+			// reply2.setPerformative(ACLMessage.REQUEST);
+			// System.out.println("[" + getLocalName() +
+			// "]: ¡¡¡Dame un poco de "
+			// + reply2.getContent() + " "
+			// + msg2.getSender().getLocalName() + "!!!");
+			// send(reply2);
+			// }
+			else {
 				block();
 			}
 		}

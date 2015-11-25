@@ -1,5 +1,6 @@
 package Agentes;
 
+import java.util.Random;
 import java.util.concurrent.CyclicBarrier;
 
 import jade.core.Agent;
@@ -31,28 +32,88 @@ public class Anfitrion extends Agent {
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		SequentialBehaviour seqBehaviour = new SequentialBehaviour();
-		seqBehaviour.addSubBehaviour(new TickerBehaviour(this, 10000) {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			protected void onTick() {
-				ACLMessage msg = blockingReceive(MessageTemplate
-						.MatchPerformative(ACLMessage.INFORM));
-				if (msg.getContent().equalsIgnoreCase("hola")) {
-					System.out.println("(" + getLocalName() + ") Buenos dias "+ msg.getSender().getLocalName());
-				}
-			}
-		});
-		addBehaviour(seqBehaviour);
+		addBehaviour(new Escuchar());
 	}
 
-	private class escuchar extends CyclicBehaviour {
-		public void action() {
+	private class Escuchar extends CyclicBehaviour {
+		MessageTemplate tratarSaludos;
+		MessageTemplate tratarComida;
+		MessageTemplate tratarAdios;
 
+		public void action() {
+			tratarSaludos = MessageTemplate.MatchConversationId("Saludo");
+			tratarComida = MessageTemplate.MatchConversationId("Comida");
+			tratarAdios = MessageTemplate.MatchConversationId("Despedida");
+			ACLMessage msg = myAgent.receive(tratarSaludos);
+			ACLMessage msg2 = myAgent.receive(tratarComida);
+			ACLMessage msg3 = myAgent.receive(tratarAdios);
+			if (msg != null) {
+				// Se ha recibido un mensaje de Saludo y lo procesamos
+				ACLMessage reply = msg.createReply();
+				reply.setConversationId("ResponderSaludo");
+				reply.setContent("Que pasa troncoo");
+				// reply.setPerformative(ACLMessage.CFP);
+				System.out.println("[" + getLocalName() + "]: ¡¡¡Que pasa "
+						+ msg.getSender().getLocalName() + "!!!");
+				send(reply);
+
+			} else if (msg2 != null) {
+				// Se ha recibido un mensaje de Comida/Bebida y lo procesamos
+				ACLMessage reply2 = msg2.createReply();
+				reply2.setConversationId("ResponderComida");
+				Random rand = new Random();
+				int ranNum = rand.nextInt(10 - 1 + 1) + 1;
+				if (ranNum == 3) {
+					reply2.setContent("Gin Tonic");
+//					bebida++;
+//					tragos++;
+				} else if (ranNum <= 2) {
+					reply2.setContent("Cerbeza");
+//					bebida++;
+//					tragos++;
+				} else if (ranNum == 4) {
+					reply2.setContent("Patxaran");
+//					bebida++;
+//					tragos++;
+				} else if (ranNum == 5) {
+					reply2.setContent("Martini");
+//					bebida++;
+//					tragos++;
+				} else if (ranNum == 5) {
+					reply2.setContent("Ron");
+//					bebida++;
+//					tragos++;
+				} else if (ranNum == 6) {
+					reply2.setContent("Whisky");
+//					bebida++;
+//					tragos++;
+				} else if (ranNum == 7) {
+					reply2.setContent("Agua");
+//					bebida--;
+				} else if (ranNum > 7) {
+					reply2.setContent("Comida");
+//					comida++;
+				}
+				reply2.setPerformative(ACLMessage.REQUEST);
+				System.out.println("[" + getLocalName()
+						+ "]: ¡¡¡Dame un poco de " + reply2.getContent() + " "
+						+ msg2.getSender().getLocalName() + "!!!");
+				send(reply2);
+			} else if (msg3 != null) {
+				// Se ha recibido un mensaje de Adios y lo procesamos
+				ACLMessage reply = msg3.createReply();
+				reply.setConversationId("ResponderAdios");
+				reply.setContent("Adios");
+				// reply.setPerformative(ACLMessage.CFP);
+				System.out.println("[" + getLocalName()
+						+ "]: ¡¡¡Muchas gracias por venir!!! ¡¡¡Hasta otra "
+						+ msg3.getSender().getLocalName() + "!!!");
+				send(reply);
+			} else {
+				block();
+			}
 		}
+
 	}
 
 }
