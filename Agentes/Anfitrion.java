@@ -1,6 +1,7 @@
 package Agentes;
 
 import java.util.Random;
+import java.util.Vector;
 import java.util.concurrent.CyclicBarrier;
 
 import jade.core.Agent;
@@ -39,8 +40,10 @@ public class Anfitrion extends Agent {
 		MessageTemplate tratarSaludos;
 		MessageTemplate tratarComida;
 		MessageTemplate tratarAdios;
+		Vector<String> comida;
 
 		public void action() {
+			comida = new Vector<String>();
 			tratarSaludos = MessageTemplate.MatchConversationId("Saludo");
 			tratarComida = MessageTemplate.MatchConversationId("Comida");
 			tratarAdios = MessageTemplate.MatchConversationId("Despedida");
@@ -48,6 +51,7 @@ public class Anfitrion extends Agent {
 			ACLMessage msg2 = myAgent.receive(tratarComida);
 			ACLMessage msg3 = myAgent.receive(tratarAdios);
 			if (msg != null) {
+				
 				// Se ha recibido un mensaje de Saludo y lo procesamos
 				ACLMessage reply = msg.createReply();
 				reply.setConversationId("ResponderSaludo");
@@ -61,39 +65,17 @@ public class Anfitrion extends Agent {
 				// Se ha recibido un mensaje de Comida/Bebida y lo procesamos
 				ACLMessage reply2 = msg2.createReply();
 				reply2.setConversationId("ResponderComida");
+				System.out.println("VECTOREKO TAMAINA: "+comida.size());
+
+				comida.add("Agua");
+				comida.add("Vino");
+				comida.add("Gin Tonic");
+				System.out.println("VECTOREKO TAMAINA: "+comida.size());
 				Random rand = new Random();
-				int ranNum = rand.nextInt(10 - 1 + 1) + 1;
-				if (ranNum == 3) {
-					reply2.setContent("Gin Tonic");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum <= 2) {
-					reply2.setContent("Cerbeza");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 4) {
-					reply2.setContent("Patxaran");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 5) {
-					reply2.setContent("Martini");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 5) {
-					reply2.setContent("Ron");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 6) {
-					reply2.setContent("Whisky");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 7) {
-					reply2.setContent("Agua");
-//					bebida--;
-				} else if (ranNum > 7) {
-					reply2.setContent("Comida");
-//					comida++;
-				}
+				int ranNum = rand.nextInt(2 - 0 + 1) + 0;
+				reply2.setContent(comida.elementAt(ranNum));
+				comida.remove(comida.elementAt(ranNum));
+				System.out.println("VECTOREKO TAMAINA: "+comida.size());
 				reply2.setPerformative(ACLMessage.REQUEST);
 				System.out.println("[" + getLocalName()
 						+ "]: ¡¡¡Dame un poco de " + reply2.getContent() + " "
