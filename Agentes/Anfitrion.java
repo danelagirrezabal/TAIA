@@ -16,7 +16,7 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 public class Anfitrion extends Agent {
-
+	Vector<String> comida =  new Vector<String>();
 	protected void setup() {
 		// Registrar party-host
 		DFAgentDescription description = new DFAgentDescription();
@@ -34,16 +34,19 @@ public class Anfitrion extends Agent {
 			fe.printStackTrace();
 		}
 		addBehaviour(new Escuchar());
+		comida.add("Agua");
+		comida.add("Vino");
+		comida.add("Gin Tonic");
 	}
 
 	private class Escuchar extends CyclicBehaviour {
 		MessageTemplate tratarSaludos;
 		MessageTemplate tratarComida;
 		MessageTemplate tratarAdios;
-		Vector<String> comida;
+		
 
 		public void action() {
-			comida = new Vector<String>();
+			
 			tratarSaludos = MessageTemplate.MatchConversationId("Saludo");
 			tratarComida = MessageTemplate.MatchConversationId("Comida");
 			tratarAdios = MessageTemplate.MatchConversationId("Despedida");
@@ -57,7 +60,7 @@ public class Anfitrion extends Agent {
 				reply.setConversationId("ResponderSaludo");
 				reply.setContent("Que pasa troncoo");
 				// reply.setPerformative(ACLMessage.CFP);
-				System.out.println("[" + getLocalName() + "]: ¡¡¡Que pasa "
+				System.out.println("[" + getLocalName() + "]: ï¿½ï¿½ï¿½Que pasa "
 						+ msg.getSender().getLocalName() + "!!!");
 				send(reply);
 
@@ -67,20 +70,28 @@ public class Anfitrion extends Agent {
 				reply2.setConversationId("ResponderComida");
 				System.out.println("VECTOREKO TAMAINA: "+comida.size());
 
-				comida.add("Agua");
-				comida.add("Vino");
-				comida.add("Gin Tonic");
+				
 				System.out.println("VECTOREKO TAMAINA: "+comida.size());
 				Random rand = new Random();
 				int ranNum = rand.nextInt(2 - 0 + 1) + 0;
-				reply2.setContent(comida.elementAt(ranNum));
-				comida.remove(comida.elementAt(ranNum));
-				System.out.println("VECTOREKO TAMAINA: "+comida.size());
-				reply2.setPerformative(ACLMessage.REQUEST);
-				System.out.println("[" + getLocalName()
-						+ "]: ¡¡¡Dame un poco de " + reply2.getContent() + " "
+				//reply2.setContent(comida.elementAt(ranNum));
+				//comida.remove(comida.elementAt(ranNum));
+				if (comida.size()!=0){
+					reply2.setContent(comida.elementAt(0));
+					comida.remove(comida.elementAt(0));
+					System.out.println("VECTOREKO TAMAINA: "+comida.size());
+					reply2.setPerformative(ACLMessage.REQUEST);
+					System.out.println("[" + getLocalName()
+						+ "]: ï¿½ï¿½ï¿½Dame un poco de " + reply2.getContent() + " "
 						+ msg2.getSender().getLocalName() + "!!!");
-				send(reply2);
+					send(reply2);	
+				} else{
+					reply2.setContent("Suficiente");
+					reply2.setPerformative(ACLMessage.REQUEST);
+					System.out.println("[" + getLocalName()
+							+ "]: No gracias, ya tengo suficiente!!!");
+					send(reply2);	
+				}
 			} else if (msg3 != null) {
 				// Se ha recibido un mensaje de Adios y lo procesamos
 				ACLMessage reply = msg3.createReply();
@@ -88,7 +99,7 @@ public class Anfitrion extends Agent {
 				reply.setContent("Adios");
 				// reply.setPerformative(ACLMessage.CFP);
 				System.out.println("[" + getLocalName()
-						+ "]: ¡¡¡Muchas gracias por venir!!! ¡¡¡Hasta otra "
+						+ "]: ï¿½ï¿½ï¿½Muchas gracias por venir!!! ï¿½ï¿½ï¿½Hasta otra "
 						+ msg3.getSender().getLocalName() + "!!!");
 				send(reply);
 			} else {

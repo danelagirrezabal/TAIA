@@ -69,7 +69,7 @@ public class Camarero extends Agent {
 				msg.setConversationId("Comida");
 				msg.setContent("Tipo de comida");
 				System.out.println("[" + getLocalName()
-						+ "]: ¿Quieres comer/beber algo "
+						+ "]: ï¿½Quieres comer/beber algo "
 						+ listaInv[i].getLocalName() + "?");
 				send(msg);
 				doWait(2000);
@@ -77,14 +77,20 @@ public class Camarero extends Agent {
 						.MatchConversationId("ResponderComida");
 				ACLMessage respuesta = myAgent.receive(tratarRespuestasComida);
 				if (respuesta != null) {
+					if (respuesta.getContent().compareTo("Suficiente") != 0){
 					// if (respuesta.getPerformative() == ACLMessage.CFP) {
 					System.out
 							.println("[" + getLocalName()
-									+ "]: ¡¡Aqui tienes tu "
+									+ "]: ï¿½ï¿½Aqui tienes tu "
 									+ respuesta.getContent() + " "
 									+ respuesta.getSender().getLocalName()
 									+ "!!");
 					System.out.println();
+					} else {
+						System.out.println("[" + getLocalName()
+									+ "]:Vale perfecto, pasarÃ© mas tarde.");
+						System.out.println();
+					}
 
 					// }
 				} else {
@@ -97,18 +103,27 @@ public class Camarero extends Agent {
 			msg.setConversationId("Comida");
 			msg.setContent("Tipo de comida");
 			System.out.println("[" + getLocalName()
-					+ "]: ¿Quieres comer/beber algo " + "Anfitrion" + "?");
+					+ "]: ï¿½Quieres comer/beber algo " + "Anfitrion" + "?");
 			send(msg);
 			doWait(2000);
 			tratarRespuestasComida = MessageTemplate
 					.MatchConversationId("ResponderComida");
 			ACLMessage respuesta = myAgent.receive(tratarRespuestasComida);
 			if (respuesta != null) {
+				if (respuesta.getContent().compareTo("Suficiente") != 0){
 				// if (respuesta.getPerformative() == ACLMessage.CFP) {
-				System.out.println("[" + getLocalName()
-						+ "]: ¡¡Aqui tienes tu " + respuesta.getContent() + " "
-						+ respuesta.getSender().getLocalName() + "!!");
+				System.out
+						.println("[" + getLocalName()
+								+ "]: ï¿½ï¿½Aqui tienes tu "
+								+ respuesta.getContent() + " "
+								+ respuesta.getSender().getLocalName()
+								+ "!!");
 				System.out.println();
+				} else {
+					System.out.println("[" + getLocalName()
+								+ "]:Vale perfecto, pasarÃ© mas tarde.");
+					System.out.println();
+				}
 
 				// }
 			} else {
