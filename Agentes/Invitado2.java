@@ -1,6 +1,7 @@
 package Agentes;
 
 import java.util.Random;
+import java.util.Vector;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -19,10 +20,11 @@ import jade.lang.acl.MessageTemplate;
 public class Invitado2 extends Agent {
 
 	private AID[] listaInv;
+	Vector<String> comida = new Vector<String>();
 
 	protected void setup() {
 		doWait(10000);
-		// Registrar party-host
+		// Registrar party-guest
 		DFAgentDescription description = new DFAgentDescription();
 		description.setName(getAID());
 		ServiceDescription serviceDescription = new ServiceDescription();
@@ -31,16 +33,21 @@ public class Invitado2 extends Agent {
 		description.addServices(serviceDescription);
 		try {
 			DFService.register(this, description);
-			System.out.println(getAID().getLocalName() + " ha llegado.");
-			System.out.println();
+			System.out.println("##################### "
+					+ getAID().getLocalName()
+					+ " ha llegado a la fiesta. #####################");
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		// Buscar invitados
 		invitados();
-		// Saludar a todos
 		addBehaviour(new Saludar());
+		comida.add("Pintxo de atún");
+		comida.add("Pintxo de tortilla");
+		comida.add("Coca cola");
+		comida.add("Café");
+		comida.add("Galletas");
 		addBehaviour(new Responder());
-		addBehaviour(new despedir(this, 20000));
 
 	}
 
@@ -50,75 +57,54 @@ public class Invitado2 extends Agent {
 		boolean fin = false;
 
 		public void onStart() {
-			System.out
-					.println("---------------------------------------------------------------------------------");
-			System.out
-					.println("["
-							+ getLocalName()
-							+ "] : He entrado... Vamos a saludar a los invitados que están en la sala.");
-			System.out
-					.println("---------------------------------------------------------------------------------\n");
+			System.out.println("-" + getLocalName()
+					+ ": Voy a saludar a todos.");
 		}
 
 		public void action() {
-
 			for (int i = 0; i < listaInv.length; i++) {
 				ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 				cfp.addReceiver(listaInv[i]);
 				cfp.setConversationId("Saludo");
 				cfp.setContent("Hola");
-				System.out.println("[" + getLocalName()
-						+ "]: Que tal va la noche "
-						+ listaInv[i].getLocalName() + "!!!");
+				System.out.println("-" + getLocalName() + ": ¡Buenas noches "
+						+ listaInv[i].getLocalName() + "!");
 				send(cfp);
 				doWait(2000);
 				tratarRespuestasSaludo = MessageTemplate
 						.MatchConversationId("ResponderSaludo");
 				ACLMessage respuesta = myAgent.receive(tratarRespuestasSaludo);
 				if (respuesta != null) {
-					// if (respuesta.getPerformative() == ACLMessage.PROPOSE) {
-					System.out.println("[" + getLocalName()
-							+ "]: Ya hablaremos después "
-							+ respuesta.getSender().getLocalName() + "!!");
+					System.out.println("-" + getLocalName()
+							+ ": ¡Muy bien! Luego hablamos "
+							+ respuesta.getSender().getLocalName());
 					System.out.println();
-					// }
 				} else {
 					block();
 				}
 			}
-			if (listaInv.length == 0) {
-				System.out
-						.println("["
-								+ getLocalName()
-								+ "] : Soy el primero en llegar. ¡¡Mejor voy a saludar al anfitrión!!\n");
-			}
 			doWait(2000);
 
-			// Saluda anfitrion
+			// Saludo al anfitrion
 			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 			cfp.addReceiver(new AID("Anfitrion", AID.ISLOCALNAME));
 			cfp.setConversationId("Saludo");
 			cfp.setContent("Hola");
-			System.out.println("[" + getLocalName() + "]: Que tal va la noche "
-					+ "Anfitrion" + "!!!");
+			System.out.println("-" + getLocalName()
+					+ ": ¡Buenas noches Anfitrion!");
 			send(cfp);
 			doWait(2000);
 			tratarRespuestasSaludo = MessageTemplate
 					.MatchConversationId("ResponderSaludo");
 			ACLMessage respuesta = myAgent.receive(tratarRespuestasSaludo);
 			if (respuesta != null) {
-				// if (respuesta.getPerformative() == ACLMessage.CFP) {
-				System.out.println("[" + getLocalName()
-						+ "]: Ya hablaremos después "
-						+ respuesta.getSender().getLocalName() + "!!");
-				System.out.println();
-
-				// }
+				System.out.println("-" + getLocalName()
+						+ ": ¡Muy bien! Luego hablamos "
+						+ respuesta.getSender().getLocalName());
 			} else {
 				block();
 			}
 			fin = true;
-
 		}
 
 		public boolean done() {
@@ -133,64 +119,39 @@ public class Invitado2 extends Agent {
 
 		public void action() {
 			tratarSaludos = MessageTemplate.MatchConversationId("Saludo");
-			// tratarComida = MessageTemplate.MatchConversationId("Comida");
+			tratarComida = MessageTemplate.MatchConversationId("Comida");
 			ACLMessage msg = myAgent.receive(tratarSaludos);
-			// ACLMessage msg2 = myAgent.receive(tratarComida);
+			ACLMessage msg2 = myAgent.receive(tratarComida);
 			if (msg != null) {
-				// Se ha recibido un mensaje de Saludo y lo procesamos
+				// Mensaje tipo Saludo
 				ACLMessage reply = msg.createReply();
 				reply.setConversationId("ResponderSaludo");
-				reply.setContent("Que pasa troncoo");
-				// reply.setPerformative(ACLMessage.CFP);
-				System.out.println("[" + getLocalName() + "]: ¡¡¡Que pasa "
-						+ msg.getSender().getLocalName() + "!!!");
+				reply.setContent("Saludo");
+				System.out.println("-" + getLocalName()
+						+ ": ¡Buenas noches. Que tal "
+						+ msg.getSender().getLocalName() + "!");
 				send(reply);
-			}
-			// else if (msg2 != null) {
-			// // Se ha recibido un mensaje de Comida y lo procesamos
-			// ACLMessage reply2 = msg2.createReply();
-			// reply2.setConversationId("ResponderComida");
-			// Random rand = new Random();
-			// int ranNum = rand.nextInt(10 - 1 + 1) + 1;
-			// if (ranNum == 3) {
-			// reply2.setContent("Gin Tonic");
-			// bebida++;
-			// tragos++;
-			// } else if (ranNum <= 2) {
-			// reply2.setContent("Cerbeza");
-			// bebida++;
-			// tragos++;
-			// } else if (ranNum == 4) {
-			// reply2.setContent("Patxaran");
-			// bebida++;
-			// tragos++;
-			// } else if (ranNum == 5) {
-			// reply2.setContent("Martini");
-			// bebida++;
-			// tragos++;
-			// } else if (ranNum == 5) {
-			// reply2.setContent("Ron");
-			// bebida++;
-			// tragos++;
-			// } else if (ranNum == 6) {
-			// reply2.setContent("Whisky");
-			// bebida++;
-			// tragos++;
-			// } else if (ranNum == 7) {
-			// reply2.setContent("Agua");
-			// bebida--;
-			// } else if (ranNum > 7) {
-			// reply2.setContent("Comida");
-			// comida++;
-			// }
-			// reply2.setPerformative(ACLMessage.REQUEST);
-			// System.out.println("[" + getLocalName() +
-			// "]: ¡¡¡Dame un poco de "
-			// + reply2.getContent() + " "
-			// + msg2.getSender().getLocalName() + "!!!");
-			// send(reply2);
-			// }
-			else {
+			} else if (msg2 != null) {
+				// Mensaje tipo Comida
+				ACLMessage reply2 = msg2.createReply();
+				reply2.setConversationId("ResponderComida");
+				if (comida.size() != 0) {
+					reply2.setContent(comida.elementAt(0));
+					comida.remove(comida.elementAt(0));
+					reply2.setPerformative(ACLMessage.REQUEST);
+					System.out.println("-" + getLocalName()
+							+ ": ¿Me podrías traer " + reply2.getContent()
+							+ " " + msg2.getSender().getLocalName() + "?");
+					send(reply2);
+				} else {
+					reply2.setContent("Suficiente");
+					reply2.setPerformative(ACLMessage.REQUEST);
+					System.out.println("-" + getLocalName()
+							+ ": No gracias, ya tengo suficiente!!!");
+					send(reply2);
+					addBehaviour(new despedir(myAgent, 3000));
+				}
+			} else {
 				block();
 			}
 		}
@@ -206,29 +167,22 @@ public class Invitado2 extends Agent {
 			DFAgentDescription[] result = DFService.search(this,
 					agentDescription);
 			listaInv = new AID[result.length - 1];
-			// System.out.println("[" + getLocalName() + "] Invitados sala:");
 			int f = 0;
 			for (int i = 0; i < result.length; ++i) {
 				if (result[i].getName().getLocalName().equals(
 						this.getLocalName()) != true) {
 					listaInv[f] = result[i].getName();
-					// System.out.println(result[i].getName().getLocalName());
 					f++;
 				}
 			}
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		// System.out.println();
 	}
 
 	private class despedir extends TickerBehaviour {
-
-		int minticks;
-
 		public despedir(Agent a, long intervalo) {
 			super(a, intervalo);
-			minticks = 0;
 		}
 
 		public void reset() {
@@ -239,27 +193,25 @@ public class Invitado2 extends Agent {
 			MessageTemplate tratarRespuestasAdios;
 			long tfin = System.currentTimeMillis();
 			int nticks = getTickCount();
-			minticks++;
 
 			ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 			cfp.addReceiver(new AID("Anfitrion", AID.ISLOCALNAME));
 			cfp.setConversationId("Despedida");
 			cfp.setContent("Adios");
-			System.out.println("[" + getLocalName() + "]: Uff ya llevo "
-					+ " tragos mejor me voy...");
-			System.out.println("[" + getLocalName()
-					+ "]: ¡¡¡Bueno increible fiesta, se agradece "
-					+ "Anfitrion" + "!!!");
+			System.out.println("-" + getLocalName()
+					+ ": Bueno, yo me voy. ¡Gracias por todo Anfitrion!");
 			send(cfp);
 			doWait(2000);
 			tratarRespuestasAdios = MessageTemplate
 					.MatchConversationId("ResponderAdios");
 			ACLMessage respuesta = myAgent.receive(tratarRespuestasAdios);
 			if (respuesta != null) {
-				System.out.println("[" + getLocalName()
-						+ "]: ¡¡¡Venga hasta otra!!!! "
-						+ respuesta.getSender().getLocalName() + "!!\n");
-				System.out.println();
+				System.out.println("-" + getLocalName()
+						+ ": ¡Lo mismo digo! ¡Hasta la próxima "
+						+ respuesta.getSender().getLocalName() + "!\n");
+				System.out.println("##################### "
+						+ getAID().getLocalName()
+						+ " ha salido de la fiesta. #####################");
 				try {
 					DFService.deregister(myAgent);
 				} catch (FIPAException e) {
