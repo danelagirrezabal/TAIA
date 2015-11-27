@@ -28,15 +28,16 @@ public class Anfitrion extends Agent {
 		try {
 			DFService.register(this, description);
 			System.out.println(getAID().getLocalName()
-					+ " esta preparado para recibir a todos los invitados.");
+					+ " esta preparado para su fiesta.");
 			System.out.println();
 		} catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		addBehaviour(new Escuchar());
 		comida.add("Agua");
 		comida.add("Vino");
 		comida.add("Gin Tonic");
+		addBehaviour(new Escuchar());
+
 	}
 
 	private class Escuchar extends CyclicBehaviour {
@@ -54,24 +55,18 @@ public class Anfitrion extends Agent {
 			ACLMessage msg2 = myAgent.receive(tratarComida);
 			ACLMessage msg3 = myAgent.receive(tratarAdios);
 			if (msg != null) {
-				
 				// Se ha recibido un mensaje de Saludo y lo procesamos
 				ACLMessage reply = msg.createReply();
 				reply.setConversationId("ResponderSaludo");
-				reply.setContent("Que pasa troncoo");
-				// reply.setPerformative(ACLMessage.CFP);
-				System.out.println("[" + getLocalName() + "]: ï¿½ï¿½ï¿½Que pasa "
-						+ msg.getSender().getLocalName() + "!!!");
+				reply.setContent("Saludo");
+				System.out.println("-" + getLocalName() + ": ¡¡¡Que tal "
+						+ msg.getSender().getLocalName() + ". Cuanto tiempo!!!");
 				send(reply);
 
 			} else if (msg2 != null) {
 				// Se ha recibido un mensaje de Comida/Bebida y lo procesamos
 				ACLMessage reply2 = msg2.createReply();
 				reply2.setConversationId("ResponderComida");
-				System.out.println("VECTOREKO TAMAINA: "+comida.size());
-
-				
-				System.out.println("VECTOREKO TAMAINA: "+comida.size());
 				Random rand = new Random();
 				int ranNum = rand.nextInt(2 - 0 + 1) + 0;
 				//reply2.setContent(comida.elementAt(ranNum));
@@ -79,7 +74,6 @@ public class Anfitrion extends Agent {
 				if (comida.size()!=0){
 					reply2.setContent(comida.elementAt(0));
 					comida.remove(comida.elementAt(0));
-					System.out.println("VECTOREKO TAMAINA: "+comida.size());
 					reply2.setPerformative(ACLMessage.REQUEST);
 					System.out.println("[" + getLocalName()
 						+ "]: ï¿½ï¿½ï¿½Dame un poco de " + reply2.getContent() + " "

@@ -1,6 +1,7 @@
 package Agentes;
 
 import java.util.Random;
+import java.util.Vector;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -19,6 +20,7 @@ import jade.lang.acl.MessageTemplate;
 public class Invitado1 extends Agent {
 
 	private AID[] listaInv;
+	Vector<String> comida = new Vector<String>();
 
 	protected void setup() {
 		doWait(5000);
@@ -39,8 +41,11 @@ public class Invitado1 extends Agent {
 		invitados();
 		// Saludar a todos
 		addBehaviour(new Saludar());
+		comida.add("Agua");
+		comida.add("Gin tonic");
+		comida.add("Patxaran");
 		addBehaviour(new Responder());
-		addBehaviour(new despedir(this, 20000));
+		addBehaviour(new despedir(this, 40000));
 
 	}
 
@@ -51,13 +56,9 @@ public class Invitado1 extends Agent {
 
 		public void onStart() {
 			System.out
-					.println("---------------------------------------------------------------------------------");
-			System.out
-					.println("["
+					.println("-"
 							+ getLocalName()
-							+ "] : He entrado... Vamos a saludar a los invitados que están en la sala.");
-			System.out
-					.println("---------------------------------------------------------------------------------\n");
+							+ ": He entrado... Vamos a saludar a los invitados que están en la sala.");
 		}
 
 		public void action() {
@@ -67,9 +68,9 @@ public class Invitado1 extends Agent {
 				cfp.addReceiver(listaInv[i]);
 				cfp.setConversationId("Saludo");
 				cfp.setContent("Hola");
-				System.out.println("[" + getLocalName()
-						+ "]: Que tal va la noche "
-						+ listaInv[i].getLocalName() + "!!!");
+				System.out.println("-" + getLocalName()
+						+ ": Que tal va la noche " + listaInv[i].getLocalName()
+						+ "!!!");
 				send(cfp);
 				doWait(2000);
 				tratarRespuestasSaludo = MessageTemplate
@@ -77,8 +78,8 @@ public class Invitado1 extends Agent {
 				ACLMessage respuesta = myAgent.receive(tratarRespuestasSaludo);
 				if (respuesta != null) {
 					// if (respuesta.getPerformative() == ACLMessage.PROPOSE) {
-					System.out.println("[" + getLocalName()
-							+ "]: Ya hablaremos después "
+					System.out.println("-" + getLocalName()
+							+ ": Ya estamos mas tarde "
 							+ respuesta.getSender().getLocalName() + "!!");
 					System.out.println();
 					// }
@@ -87,10 +88,8 @@ public class Invitado1 extends Agent {
 				}
 			}
 			if (listaInv.length == 0) {
-				System.out
-						.println("["
-								+ getLocalName()
-								+ "] : Soy el primero en llegar. ¡¡Mejor voy a saludar al anfitrión!!\n");
+				System.out.println("-" + getLocalName()
+						+ ": Voy a saludar al anfitrión!!\n");
 			}
 			doWait(2000);
 
@@ -99,8 +98,8 @@ public class Invitado1 extends Agent {
 			cfp.addReceiver(new AID("Anfitrion", AID.ISLOCALNAME));
 			cfp.setConversationId("Saludo");
 			cfp.setContent("Hola");
-			System.out.println("[" + getLocalName() + "]: Que tal va la noche "
-					+ "Anfitrion" + "!!!");
+			System.out.println("-" + getLocalName() + ": Que tal va la noche "
+					+ "Anfitrion!!!");
 			send(cfp);
 			doWait(2000);
 			tratarRespuestasSaludo = MessageTemplate
@@ -108,8 +107,8 @@ public class Invitado1 extends Agent {
 			ACLMessage respuesta = myAgent.receive(tratarRespuestasSaludo);
 			if (respuesta != null) {
 				// if (respuesta.getPerformative() == ACLMessage.CFP) {
-				System.out.println("[" + getLocalName()
-						+ "]: Ya hablaremos después "
+				System.out.println("-" + getLocalName()
+						+ ": Ya hablaremos después "
 						+ respuesta.getSender().getLocalName() + "!!");
 				System.out.println();
 
@@ -140,9 +139,10 @@ public class Invitado1 extends Agent {
 				// Se ha recibido un mensaje de Saludo y lo procesamos
 				ACLMessage reply = msg.createReply();
 				reply.setConversationId("ResponderSaludo");
-				reply.setContent("Que pasa troncoo");
+				reply.setContent("Saludo");
 				// reply.setPerformative(ACLMessage.CFP);
-				System.out.println("[" + getLocalName() + "]: ¡¡¡Que pasa "
+				System.out.println("-" + getLocalName()
+						+ ": ¡¡¡Buenas noches. Que tal "
 						+ msg.getSender().getLocalName() + "!!!");
 				send(reply);
 			} else if (msg2 != null) {
@@ -150,44 +150,27 @@ public class Invitado1 extends Agent {
 				ACLMessage reply2 = msg2.createReply();
 				reply2.setConversationId("ResponderComida");
 				Random rand = new Random();
-				int ranNum = rand.nextInt(10 - 1 + 1) + 1;
-				if (ranNum == 3) {
-					reply2.setContent("Gin Tonic");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum <= 2) {
-					reply2.setContent("Cerbeza");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 4) {
-					reply2.setContent("Patxaran");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 5) {
-					reply2.setContent("Martini");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 5) {
-					reply2.setContent("Ron");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 6) {
-					reply2.setContent("Whisky");
-//					bebida++;
-//					tragos++;
-				} else if (ranNum == 7) {
-					reply2.setContent("Agua");
-//					bebida--;
-				} else if (ranNum > 7) {
-					reply2.setContent("Comida");
-//					comida++;
+				int ranNum = rand.nextInt(2 - 0 + 1) + 0;
+
+				if (comida.size() != 0) {
+					reply2.setContent(comida.elementAt(0));
+					comida.remove(comida.elementAt(0));
+					reply2.setPerformative(ACLMessage.REQUEST);
+					System.out.println("[" + getLocalName()
+							+ "]: ï¿½ï¿½ï¿½Dame un poco de "
+							+ reply2.getContent() + " "
+							+ msg2.getSender().getLocalName() + "!!!");
+					send(reply2);
+				} else {
+					reply2.setContent("Suficiente");
+					reply2.setPerformative(ACLMessage.REQUEST);
+					System.out.println("[" + getLocalName()
+							+ "]: No gracias, ya tengo suficiente!!!");
+					send(reply2);
 				}
-				reply2.setPerformative(ACLMessage.REQUEST);
-				System.out.println("[" + getLocalName()
-						+ "]: ¡¡¡Dame un poco de " + reply2.getContent() + " "
-						+ msg2.getSender().getLocalName() + "!!!");
-				send(reply2);
-			} else {
+			}
+
+			else {
 				block();
 			}
 		}
